@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 import re
 import subprocess
 import sys
@@ -251,6 +252,61 @@ def test_positive_completion_evidence_is_accepted(tmp_path, status):
     save_manifest(tmp_path, manifest)
     write_done_evidence(tmp_path, "P2: локальное улучшение" if status == "done_with_p2" else "нет")
     assert validate_package(tmp_path) == []
+
+
+def test_result_file_hashes_exclude_git_metadata(tmp_path):
+    result = tmp_path / "result"
+    git_objects = result / ".git" / "objects" / "ab"
+    git_objects.mkdir(parents=True)
+    (result / "public.txt").write_text("public result\n", encoding="utf-8")
+    (result / ".git" / "HEAD").write_text("ref: refs/heads/main\n", encoding="utf-8")
+    (result / ".git" / "config").write_text("[core]\n", encoding="utf-8")
+    (git_objects / "object").write_bytes(b"git object")
+    manifest = {"tasks": [{"kind": "generation", "outputs": ["result"]}]}
+    issues = []
+
+    hashes = validator.result_file_hashes(manifest, tmp_path, issues)
+
+    assert set(hashes) == {"result/public.txt"}
+    assert issues == []
+
+
+def test_json_evidence_with_required_fields_is_accepted(tmp_path):
+    path = tmp_path / "PREFLIGHT.json"
+    path.write_text(
+        json.dumps(
+            {
+                "действие": "выполнен pre-flight",
+                "доказательство": "validator exit 0",
+                "итог": "обязательные входы проверены",
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    issues = []
+
+    validator.check_evidence(path, tmp_path, "running", issues)
+
+    assert issues == []
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"действие": "выполнен pre-flight", "доказательство": "validator exit 0"},
+        {"действие": "выполнен pre-flight", "доказательство": "validator exit 0", "итог": ""},
+    ],
+)
+def test_json_evidence_with_missing_or_empty_field_is_rejected(tmp_path, payload):
+    path = tmp_path / "PREFLIGHT.json"
+    path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+    issues = []
+
+    validator.check_evidence(path, tmp_path, "running", issues)
+
+    assert [issue.code for issue in issues] == ["invalid_evidence"]
+    assert issues[0].severity == "P1"
 
 
 @pytest.mark.parametrize("status", ["done", "done_with_p2"])

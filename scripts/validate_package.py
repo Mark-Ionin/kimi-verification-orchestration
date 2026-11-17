@@ -528,7 +528,17 @@ def check_evidence(path: Path, root: Path, status: str, issues: list[Issue]) -> 
     text = read_text(path, issues, root)
     if text is None:
         return
-    fields = {match.group(1).lower(): match.group(2) for match in EVIDENCE_PATTERN.finditer(text)}
+    if path.suffix == ".json":
+        try:
+            data = json.loads(text)
+        except json.JSONDecodeError:
+            data = None
+        fields = {
+            key.lower(): value.strip() if isinstance(value, str) else ""
+            for key, value in data.items()
+        } if isinstance(data, dict) else {}
+    else:
+        fields = {match.group(1).lower(): match.group(2) for match in EVIDENCE_PATTERN.finditer(text)}
     if any(not fields.get(field) for field in ("действие", "доказательство", "итог")):
         issues.append(
             Issue("P1", "invalid_evidence", f"Нужны действие, доказательство и итог: {path.relative_to(root)}")
@@ -582,11 +592,14 @@ def result_file_hashes(manifest: dict, root: Path, issues: list[Issue]) -> dict[
                 continue
             paths = sorted(path.rglob("*")) if path.is_dir() else [path]
             for item in paths:
+                item_relative = item.relative_to(root)
+                if ".git" in item_relative.parts:
+                    continue
                 if not item.is_file():
                     if item == path:
                         issues.append(Issue("P1", "missing_output", f"Нет выхода: {relative}"))
                     continue
-                name = item.relative_to(root).as_posix()
+                name = item_relative.as_posix()
                 try:
                     result[name] = hashlib.sha256(item.read_bytes()).hexdigest()
                 except OSError as exc:
