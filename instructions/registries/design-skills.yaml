@@ -1,0 +1,28 @@
+version: 1
+blocking_exit_severities: [P0, P1]
+routes:
+  a3: [a3-system, a3-build, print-verify, visual-review]
+skills:
+  a3-init: {mode: automatic, use: "инициализация A3-проекта"}
+  a3-system: {mode: automatic, use: "дизайн-система A3"}
+  a3-build: {mode: automatic, use: "сборка и правки A3"}
+  print-verify: {mode: automatic, use: "блокирующая печатная проверка"}
+  visual-review: {mode: independent, use: "визуальная критика без правок"}
+  canvas-design: {mode: automatic, use: "статичная графика"}
+  frontend-design: {mode: automatic, use: "визуальное направление интерфейсов"}
+  design-taste-frontend: {mode: automatic, use: "сайты и визуальная критика"}
+  brandkit: {mode: automatic, use: "бренд-системы"}
+  minimalist-ui: {mode: opt-in, use: "минималистичный интерфейс"}
+  industrial-brutalist-ui: {mode: opt-in, use: "индустриальный брутализм"}
+  gpt-taste: {mode: manual, use: "явно назначенная дизайн-критика"}
+  stitch-design-taste: {mode: manual, use: "явно назначенный дизайн"}
+  high-end-visual-design: {mode: manual, use: "явно назначенный визуальный стиль"}
+  image-to-code: {mode: manual, use: "реализация по изображению"}
+  imagegen-frontend-web: {mode: manual, use: "веб-референсы по секциям"}
+  imagegen-frontend-mobile: {mode: manual, use: "мобильные экраны"}
+rules:
+  - "Не переустанавливать и не переименовывать скиллы"
+  - "Обязательный скилл проходит pre-flight"
+  - "Opt-in и manual назначаются конкретному агенту явно"
+  - "print-verify оценивается по фактическому коду завершения"
+  - "visual-review выполняет отдельный независимый агент"

@@ -1,0 +1,101 @@
+schema_version: 3
+package_id: replace-with-task-slug
+status: drafted
+scope:
+  objective: replace-with-objective
+  acceptance_criteria: []
+execution:
+  owner: kimi_code
+  mode: team
+  stop_policy: null
+  implementation_authorized: false
+  continue_after_preflight: true
+  approval:
+    approved_at: null
+    approved_by: null
+    evidence: null
+model_profile:
+  name: code-example
+  path: model-profile.yaml
+  sha256: 78538ef22f32ed6855ab0afa852b6326508e02282af2679b2cd5884d1ecc5d0f
+permissions:
+  subagents: ask
+  verifier_subagent: ask
+  swarm: deny
+  approved_agents: []
+  max_parallel: 1
+  evidence: RUN_LOG.md
+  commits: ask
+  publish: ask
+  destructive_actions: ask
+  installation: ask
+package_check:
+  status: not_started
+  agent: A4
+  result: verification/PACKAGE_CHECK.json
+  log: verification/PACKAGE_CHECK.log
+decision_checkpoints: []
+implementation:
+  status: not_started
+  scope: replace-with-task-scope
+  draft_outputs: []
+agents:
+  - id: A2
+    role: generator
+    path: agents/A2_generator/AGENT.md
+    capability: implementation
+    required_skills: []
+    optional_skills: []
+  - id: A3
+    role: verifier
+    path: agents/A3_verifier/AGENT.md
+    capability: independent_verification
+    required_skills: []
+    optional_skills: []
+  - id: A4
+    role: package_checker
+    path: agents/A4_package_checker/AGENT.md
+    capability: deterministic_package_check
+    required_skills: []
+    optional_skills: []
+  - id: A5
+    role: model_reviewer
+    path: agents/A5_model_reviewer/AGENT.md
+    capability: model_assignment_review
+    required_skills: []
+    optional_skills: []
+tasks:
+  - id: T1
+    agent: A2
+    kind: generation
+    depends_on: []
+    inputs: []
+    outputs: [result.md, RUN_LOG.md]
+    model: k3.1-pro
+    effort: low
+    reason: Replace with a task-specific reason; low is the default general assignment.
+    assignment_source: kimi
+  - id: T2
+    agent: A3
+    kind: verification
+    depends_on: [T1]
+    inputs: [result.md, RUN_LOG.md]
+    outputs: [verification/REPORT.md]
+    model: k3.1-pro
+    effort: high
+    reason: Fixed example policy assigns independent verification to K3.1 high.
+    assignment_source: fixed_policy
+verification:
+  enabled: true
+  status: not_started
+  independent_required: true
+  level: small
+  small_profile: "М1"
+  full_profiles: []
+  verifier: A3
+  plan: verification/PLAN.md
+  open_p0: 0
+  open_p1: 0
+  open_p2: 0
+completion:
+  required_evidence: []

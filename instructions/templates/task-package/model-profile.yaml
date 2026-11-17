@@ -1,0 +1,19 @@
+name: code-example
+models:
+  k3.1-pro:
+    display_name: K3.1 Pro
+  kimi-for-coding:
+    display_name: K2.8 Preview
+aliases:
+  - {model: k3.1-pro, effort: low, runtime_alias: k3.1-pro-low}
+  - {model: k3.1-pro, effort: high, runtime_alias: k3.1-pro-high}
+  - {model: k3.1-pro, effort: max, runtime_alias: k3.1-pro-max}
+  - {model: kimi-for-coding, effort: low, runtime_alias: kimi-for-coding-low}
+  - {model: kimi-for-coding, effort: high, runtime_alias: kimi-for-coding-high}
+  - {model: kimi-for-coding, effort: max, runtime_alias: kimi-for-coding-max}
+policy:
+  default: k3.1-pro low
+  verifier: k3.1-pro high
+  model_reviewer: k3.1-pro high
+  code_tasks: kimi-for-coding with effort selected by complexity
+  max: orchestrator decision with a concrete reason why lower effort is insufficient
