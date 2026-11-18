@@ -113,6 +113,18 @@ def test_schema3_instructions_preserve_team_models_and_review_contract():
         assert required in core
 
 
+def test_code_package_creation_session_stops_before_execution():
+    agents = (INSTRUCTIONS / "AGENTS.md").read_text(encoding="utf-8")
+    code = (INSTRUCTIONS / "adapters" / "kimi-code.md").read_text(encoding="utf-8")
+    core = (INSTRUCTIONS / "core" / "orchestration.md").read_text(encoding="utf-8")
+    launch = (INSTRUCTIONS / "templates" / "task-package" / "LAUNCH.md").read_text(encoding="utf-8")
+    assert "не разрешает исполнение созданного пакета в той же Code-сессии" in agents
+    assert "В создавшей пакет сессии запрещено проводить pre-flight" in code
+    assert "implementation_authorized" in core
+    assert "continue_after_preflight" in core
+    assert "Если пакет создан в текущей сессии, не выполняй его" in launch
+
+
 def test_code_adapter_requires_new_session_and_blocks_model_fallback():
     code = (INSTRUCTIONS / "adapters" / "kimi-code.md").read_text(encoding="utf-8")
     assert "новой основной Code-сессии" in code

@@ -78,9 +78,9 @@ The checker records the command, exit code, stdout, stderr, JSON result, `packag
 
 ## Start a Code package in a new session
 
-A Code session that creates a package does not execute it. After a successful package check, it saves `LAUNCH.md` and stops.
+A Code session that creates a package does not execute it. After a successful package check, it saves `LAUNCH.md` and immediately ends its current response. In that same session, execution pre-flight, DAG or executor-subagent launch, implementation, and package tests are forbidden. Starting approval, `implementation_authorized`, `continue_after_preflight`, other permissions, and later user messages do not override this prohibition.
 
-The user manually starts a new main Code session using the command and first message from `LAUNCH.md`. After pre-flight, that new session continues without another starting approval within the existing permissions.
+The user manually starts a new main Code session using the command and first message from `LAUNCH.md`. Only that new session continues immediately after pre-flight without another starting approval within the existing permissions.
 
 Pre-flight must confirm the assigned model, effort, and every runtime alias. Unavailability is a blocker. Hidden fallback is forbidden; a replacement requires renewed user agreement and package revalidation.
 
